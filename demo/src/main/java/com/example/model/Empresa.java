@@ -37,4 +37,9 @@ public class Empresa extends EntidadeBase {
     public void setEmail(String email) {
         this.email = email;
     }
+
+    @Override
+    public String getResumo() {
+        return "Empresa #" + getId() + " - " + nomeFantasia;
+    }
 }

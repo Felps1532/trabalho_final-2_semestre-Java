@@ -103,10 +103,15 @@ public class ProdutoDAO {
     }
 
     public void deletar(int id) {
+        String sqlVendaProdutos = "DELETE FROM venda_produtos WHERE id_produto = ?";
         String sql = "DELETE FROM produtos WHERE id = ?";
 
         try {
             Connection conn = ConnectionFactory.getConnection();
+            PreparedStatement stmtVendaProdutos = conn.prepareStatement(sqlVendaProdutos);
+            stmtVendaProdutos.setInt(1, id);
+            stmtVendaProdutos.executeUpdate();
+
             PreparedStatement stmt = conn.prepareStatement(sql);
 
             stmt.setInt(1, id);

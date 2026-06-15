@@ -16,4 +16,9 @@ public class Produto extends EntidadeBase {
     public void setDescricao(String descricao) {
         this.descricao = descricao;
     }
+
+    @Override
+    public String getResumo() {
+        return "Produto #" + getId() + " - " + nome;
+    }
 }

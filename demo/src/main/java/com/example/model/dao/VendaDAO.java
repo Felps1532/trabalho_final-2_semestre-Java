@@ -11,6 +11,7 @@ import java.sql.ResultSet;
 
 import com.example.model.Contato;
 import com.example.model.Empresa;
+import com.example.model.Produto;
 import com.example.model.Usuario;
 import com.example.model.Venda;
 
@@ -147,10 +148,15 @@ public class VendaDAO {
     }
 
     public void deletar(int id) {
+        String sqlVendaProdutos = "DELETE FROM venda_produtos WHERE id_venda = ?";
         String sql = "DELETE FROM vendas WHERE id = ?";
 
         try {
             Connection conn = ConnectionFactory.getConnection();
+            PreparedStatement stmtVendaProdutos = conn.prepareStatement(sqlVendaProdutos);
+            stmtVendaProdutos.setInt(1, id);
+            stmtVendaProdutos.executeUpdate();
+
             PreparedStatement stmt = conn.prepareStatement(sql);
 
             stmt.setInt(1, id);
@@ -161,6 +167,53 @@ public class VendaDAO {
         } catch (SQLException e) {
             JOptionPane.showMessageDialog(null, "Erro ao deletar venda: " + e.getMessage());
         }
+    }
+
+    public void vincularProduto(int idVenda, int idProduto) {
+        String sql = "INSERT INTO venda_produtos (id_venda, id_produto) VALUES (?, ?)";
+
+        try {
+            Connection conn = ConnectionFactory.getConnection();
+            PreparedStatement stmt = conn.prepareStatement(sql);
+
+            stmt.setInt(1, idVenda);
+            stmt.setInt(2, idProduto);
+
+            stmt.executeUpdate();
+
+            JOptionPane.showMessageDialog(null, "Produto vinculado a venda com sucesso!");
+        } catch (SQLException e) {
+            JOptionPane.showMessageDialog(null, "Erro ao vincular produto a venda: " + e.getMessage());
+        }
+    }
+
+    public ArrayList<Produto> listarProdutosDaVenda(int idVenda) {
+        String sql = "SELECT p.* FROM produtos p INNER JOIN venda_produtos vp ON p.id = vp.id_produto WHERE vp.id_venda = ?";
+
+        ArrayList<Produto> produtos = new ArrayList<>();
+
+        try {
+            Connection conn = ConnectionFactory.getConnection();
+            PreparedStatement stmt = conn.prepareStatement(sql);
+
+            stmt.setInt(1, idVenda);
+
+            ResultSet rs = stmt.executeQuery();
+
+            while (rs.next()) {
+                Produto produto = new Produto();
+
+                produto.setId(rs.getInt("id"));
+                produto.setNome(rs.getString("nome"));
+                produto.setDescricao(rs.getString("descricao"));
+
+                produtos.add(produto);
+            }
+        } catch (SQLException e) {
+            JOptionPane.showMessageDialog(null, "Erro ao listar produtos da venda: " + e.getMessage());
+        }
+
+        return produtos;
     }
 
     private Venda montarVenda(ResultSet rs) throws SQLException {

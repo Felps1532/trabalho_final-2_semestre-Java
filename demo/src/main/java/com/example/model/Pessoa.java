@@ -2,7 +2,6 @@ package com.example.model;
 
 public abstract class Pessoa extends EntidadeBase {
     private String nome;
-    private String telefone;
     private String email;
 
     public String getNome() {
@@ -10,12 +9,6 @@ public abstract class Pessoa extends EntidadeBase {
     }
     public void setNome(String nome) {
         this.nome = nome;
-    }
-    public String getTelefone() {
-        return telefone;
-    }
-    public void setTelefone(String telefone) {
-        this.telefone = telefone;
     }
     public String getEmail() {
         return email;

@@ -18,4 +18,8 @@ public abstract class EntidadeBase {
     public void setDataEntrada(LocalDateTime dataEntrada) {
         this.dataEntrada = dataEntrada;
     }
+
+    public String getResumo() {
+        return "Entidade ID: " + id;
+    }
 }

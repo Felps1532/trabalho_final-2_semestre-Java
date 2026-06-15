@@ -53,4 +53,9 @@ public class Venda extends EntidadeBase {
     public void setStatus(String status) {
         this.status = status;
     }
+
+    @Override
+    public String getResumo() {
+        return "Venda #" + getId() + " - " + status + " - R$ " + valor;
+    }
 }
