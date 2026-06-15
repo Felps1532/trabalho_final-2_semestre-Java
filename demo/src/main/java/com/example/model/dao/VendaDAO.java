@@ -187,6 +187,28 @@ public class VendaDAO {
         }
     }
 
+    public void desvincularProduto(int idVenda, int idProduto) {
+        String sql = "DELETE FROM venda_produtos WHERE id_venda = ? AND id_produto = ?";
+
+        try {
+            Connection conn = ConnectionFactory.getConnection();
+            PreparedStatement stmt = conn.prepareStatement(sql);
+
+            stmt.setInt(1, idVenda);
+            stmt.setInt(2, idProduto);
+
+            int linhasAfetadas = stmt.executeUpdate();
+
+            if (linhasAfetadas > 0) {
+                JOptionPane.showMessageDialog(null, "Produto desvinculado da venda com sucesso!");
+            } else {
+                JOptionPane.showMessageDialog(null, "Este produto nao estava vinculado a venda.");
+            }
+        } catch (SQLException e) {
+            JOptionPane.showMessageDialog(null, "Erro ao desvincular produto da venda: " + e.getMessage());
+        }
+    }
+
     public ArrayList<Produto> listarProdutosDaVenda(int idVenda) {
         String sql = "SELECT p.* FROM produtos p INNER JOIN venda_produtos vp ON p.id = vp.id_produto WHERE vp.id_venda = ?";
 

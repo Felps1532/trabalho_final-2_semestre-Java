@@ -44,7 +44,6 @@ O Floomes e um CRM simplificado inspirado no Ploomes. Ele permite que um usuario
    - Contatos
    - Vendas
    - Relatorio de vendas
-   - Demonstracao de polimorfismo
    - Alterar senha
 
 ## Requisitos obrigatorios
@@ -61,62 +60,34 @@ O Floomes e um CRM simplificado inspirado no Ploomes. Ele permite que um usuario
 - Menu de cadastro e consulta: `Main.java` possui menus de Produtos, Empresas, Contatos e Vendas.
 - Relatorio envolvendo varias classes: opcao `Relatorio de vendas` usa `Venda`, `Contato`, `Empresa`, `Usuario` e `Produto`.
 - Heranca: `Usuario` e `Contato` herdam de `Pessoa`; `Produto`, `Empresa` e `Venda` herdam de `EntidadeBase`.
-- Polimorfismo: opcao `Demonstrar polimorfismo`, usando lista de `EntidadeBase` e o metodo sobrescrito `getResumo()`.
+- Polimorfismo: metodo `getResumo()` declarado em `EntidadeBase` e sobrescrito em `Usuario`, `Empresa`, `Contato`, `Produto` e `Venda`.
 - Classe abstrata ou interface: `EntidadeBase` e `Pessoa`.
 - Leitura e escrita em banco de dados: DAOs usam JDBC/MySQL.
 
-## Roteiro para apresentar em ate 5 minutos
+## Roteiro de apresentacao
 
-1. Apresente a ideia:
-   - "Meu projeto e um CRM simplificado chamado Floomes, inspirado no Ploomes."
-2. Explique as entidades:
-   - Usuario: quem acessa o sistema.
-   - Empresa: empresa cliente.
-   - Contato: pessoa vinculada a empresa.
-   - Produto: produto ou servico vendido.
-   - Venda: negociacao ou venda feita pelo usuario.
-3. Mostre o login:
-   - email `felipe@floomes.com`, senha `123`.
-4. Mostre rapidamente um CRUD:
-   - Produtos ou Empresas.
-5. Mostre Contatos:
-   - explique que contato tem uma empresa vinculada.
-6. Mostre Vendas:
-   - explique que venda liga contato, empresa e vendedor.
-7. Mostre o relatorio:
-   - ele junta varias classes.
-8. Mostre polimorfismo:
-   - explique que a lista e de `EntidadeBase`, mas cada classe executa seu proprio `getResumo()`.
+1. Mostre o login com `UsuarioDAO.autenticar()`.
+2. Mostre o menu principal.
+3. Mostre um CRUD rapido, por exemplo Produtos.
+4. Mostre Contatos e explique que contato possui uma empresa.
+5. Mostre Vendas e explique que venda possui contato, empresa e vendedor.
+   - No menu de vendas, mostre tambem "Gerenciar produtos da venda" para vincular ou desvincular produtos.
+6. Mostre o Relatorio de vendas.
+7. Mostre `getResumo()` para explicar polimorfismo.
 
-## Perguntas provaveis do professor
+## Produtos em uma venda
 
-### Onde tem heranca?
+A venda fica na tabela `vendas`, mas os produtos vendidos ficam na tabela intermediaria `venda_produtos`.
 
-`Usuario` e `Contato` herdam de `Pessoa`. `Produto`, `Empresa`, `Venda` e `Pessoa` herdam de `EntidadeBase`.
+No sistema, isso aparece no menu:
 
-### Onde tem polimorfismo?
+- `Vendas`
+- `Gerenciar produtos da venda`
 
-Na opcao "Demonstrar polimorfismo". A `Main` cria uma lista de `EntidadeBase`, coloca objetos de classes diferentes nela e chama `getResumo()`. Cada classe responde de um jeito, porque sobrescreve o metodo.
+Nessa tela e possivel:
 
-### O que e DAO?
+- listar produtos vinculados a venda;
+- vincular um produto;
+- desvincular um produto.
 
-DAO significa Data Access Object. No projeto, os DAOs separam o acesso ao banco do resto do sistema. Exemplo: `ProdutoDAO` sabe cadastrar, listar, buscar, atualizar e deletar produtos no MySQL.
-
-### O que e composicao?
-
-Composicao acontece quando uma classe possui outra como atributo. Exemplo: `Venda` possui `Contato`, `Usuario` e `Empresa`. Isso representa as foreign keys do banco no Java.
-
-### Por que usar PreparedStatement?
-
-Porque ele prepara o SQL com parametros `?`, permite setar valores com tipo correto e evita montar SQL manualmente concatenando strings.
-
-### Como funciona a regra das 3 ultimas senhas?
-
-Quando o usuario troca a senha, o sistema busca as 3 ultimas senhas em `prev_senhas`. Se a nova senha estiver entre elas, a troca e bloqueada. Se estiver tudo certo, a senha antiga e salva em `prev_senhas` e a nova senha vai para `usuarios`.
-
-## Pontos para falar se perguntarem sobre melhorias
-
-- Hoje as senhas estao em texto simples porque o foco e aprendizado de Java/JDBC. Em um sistema real, usaria hash de senha.
-- A interface usa `JOptionPane` para manter o projeto simples.
-- A `Main` concentra menus e fluxo; em um projeto maior, isso poderia ser separado em classes de view/controller.
-- A tabela `venda_produtos` representa quais produtos foram vinculados a cada venda. No menu de vendas existe a opcao "Vincular produto a venda".
+Ao atualizar uma venda, o sistema tambem pergunta se voce deseja gerenciar os produtos dela.

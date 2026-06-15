@@ -9,7 +9,6 @@ import javax.swing.JOptionPane;
 
 import com.example.model.Contato;
 import com.example.model.Empresa;
-import com.example.model.EntidadeBase;
 import com.example.model.Produto;
 import com.example.model.Usuario;
 import com.example.model.Venda;
@@ -56,8 +55,7 @@ public class Main {
                     "3 - Contatos\n" +
                     "4 - Vendas\n" +
                     "5 - Relatorio de vendas\n" +
-                    "6 - Demonstrar polimorfismo\n" +
-                    "7 - Alterar senha\n" +
+                    "6 - Alterar senha\n" +
                     "0 - Sair");
 
             if (opcao == 1) {
@@ -71,8 +69,6 @@ public class Main {
             } else if (opcao == 5) {
                 mostrarRelatorioVendas();
             } else if (opcao == 6) {
-                demonstrarPolimorfismo();
-            } else if (opcao == 7) {
                 alterarSenha(usuarioLogado);
             } else if (opcao == 0) {
                 JOptionPane.showMessageDialog(null, "Saindo do sistema...");
@@ -337,7 +333,7 @@ public class Main {
                     "3. Buscar venda por ID\n" +
                     "4. Atualizar venda\n" +
                     "5. Deletar venda\n" +
-                    "6. Vincular produto a venda\n" +
+                    "6. Gerenciar produtos da venda\n" +
                     "0. Voltar");
 
             if (opcaoVenda == 1) {
@@ -377,7 +373,7 @@ public class Main {
                     JOptionPane.showMessageDialog(null, "Venda nao encontrada.");
                 }
             } else if (opcaoVenda == 6) {
-                vincularProdutoVenda();
+                gerenciarProdutosVenda();
             } else if (opcaoVenda == 0) {
                 JOptionPane.showMessageDialog(null, "Voltando ao menu principal...");
             } else {
@@ -414,7 +410,7 @@ public class Main {
         vendaDAO.cadastrar(venda);
     }
 
-    private static void vincularProdutoVenda() {
+    private static void gerenciarProdutosVenda() {
         Venda venda = vendaDAO.buscarPorId(lerInt("Digite o id da venda"));
 
         if (venda == null) {
@@ -422,6 +418,45 @@ public class Main {
             return;
         }
 
+        gerenciarProdutosVenda(venda);
+    }
+
+    private static void gerenciarProdutosVenda(Venda venda) {
+        int opcaoProdutoVenda = -1;
+
+        while (opcaoProdutoVenda != 0) {
+            opcaoProdutoVenda = lerInt("Produtos da Venda #" + venda.getId() + "\n\n" +
+                    "1. Listar produtos vinculados\n" +
+                    "2. Vincular produto\n" +
+                    "3. Desvincular produto\n" +
+                    "0. Voltar");
+
+            if (opcaoProdutoVenda == 1) {
+                listarProdutosVinculados(venda);
+            } else if (opcaoProdutoVenda == 2) {
+                vincularProdutoVenda(venda);
+            } else if (opcaoProdutoVenda == 3) {
+                desvincularProdutoVenda(venda);
+            } else if (opcaoProdutoVenda == 0) {
+                JOptionPane.showMessageDialog(null, "Voltando ao menu de vendas...");
+            } else {
+                JOptionPane.showMessageDialog(null, "Opcao invalida.");
+            }
+        }
+    }
+
+    private static void listarProdutosVinculados(Venda venda) {
+        ArrayList<Produto> produtos = vendaDAO.listarProdutosDaVenda(venda.getId());
+        StringBuilder mensagem = new StringBuilder();
+
+        for (Produto produto : produtos) {
+            mensagem.append(montarTextoProduto(produto)).append("\n----------------------\n");
+        }
+
+        mostrarMensagemOuVazio(mensagem, "Nenhum produto vinculado a esta venda.");
+    }
+
+    private static void vincularProdutoVenda(Venda venda) {
         Produto produto = produtoDAO.buscarPorId(lerInt("Digite o id do produto"));
 
         if (produto == null) {
@@ -430,6 +465,24 @@ public class Main {
         }
 
         vendaDAO.vincularProduto(venda.getId(), produto.getId());
+    }
+
+    private static void desvincularProdutoVenda(Venda venda) {
+        Produto produto = produtoDAO.buscarPorId(lerInt("Digite o id do produto que deseja desvincular"));
+
+        if (produto == null) {
+            JOptionPane.showMessageDialog(null, "Produto nao encontrado.");
+            return;
+        }
+
+        int confirmar = JOptionPane.showConfirmDialog(null,
+                "Deseja desvincular este produto da venda?\n\n" + montarTextoProduto(produto),
+                "Confirmar desvinculo",
+                JOptionPane.YES_NO_OPTION);
+
+        if (confirmar == JOptionPane.YES_OPTION) {
+            vendaDAO.desvincularProduto(venda.getId(), produto.getId());
+        }
     }
 
     private static void atualizarVenda(Usuario usuarioLogado) {
@@ -473,6 +526,15 @@ public class Main {
         venda.setVendedorResp(usuarioLogado);
 
         vendaDAO.atualizar(venda);
+
+        int gerenciarProdutos = JOptionPane.showConfirmDialog(null,
+                "Deseja gerenciar os produtos desta venda agora?",
+                "Produtos da venda",
+                JOptionPane.YES_NO_OPTION);
+
+        if (gerenciarProdutos == JOptionPane.YES_OPTION) {
+            gerenciarProdutosVenda(venda);
+        }
     }
 
     private static void mostrarRelatorioVendas() {
@@ -509,49 +571,6 @@ public class Main {
         mensagem.append("Vendas em aberto: ").append(qtdAbertas).append("\n");
         mensagem.append("Vendas perdidas: ").append(qtdPerdidas).append("\n");
         mensagem.append("Total ganho: R$ ").append(totalGanho);
-
-        JOptionPane.showMessageDialog(null, mensagem.toString());
-    }
-
-    private static void demonstrarPolimorfismo() {
-        ArrayList<EntidadeBase> entidades = new ArrayList<>();
-
-        ArrayList<Produto> produtos = produtoDAO.listar();
-        ArrayList<Empresa> empresas = empresaDAO.listar();
-        ArrayList<Contato> contatos = contatoDAO.listar();
-        ArrayList<Venda> vendas = vendaDAO.listar();
-
-        if (!produtos.isEmpty()) {
-            entidades.add(produtos.get(0));
-        }
-
-        if (!empresas.isEmpty()) {
-            entidades.add(empresas.get(0));
-        }
-
-        if (!contatos.isEmpty()) {
-            entidades.add(contatos.get(0));
-        }
-
-        if (!vendas.isEmpty()) {
-            entidades.add(vendas.get(0));
-        }
-
-        if (entidades.isEmpty()) {
-            JOptionPane.showMessageDialog(null, "Cadastre pelo menos uma entidade para demonstrar polimorfismo.");
-            return;
-        }
-
-        StringBuilder mensagem = new StringBuilder();
-        mensagem.append("Polimorfismo\n\n");
-        mensagem.append("A lista abaixo e do tipo EntidadeBase,\n");
-        mensagem.append("mas cada objeto executa seu proprio getResumo().\n\n");
-
-        for (EntidadeBase entidade : entidades) {
-            mensagem.append(entidade.getResumo()).append("\n");
-            mensagem.append("Classe real: ").append(entidade.getClass().getSimpleName()).append("\n");
-            mensagem.append("----------------------\n");
-        }
 
         JOptionPane.showMessageDialog(null, mensagem.toString());
     }
